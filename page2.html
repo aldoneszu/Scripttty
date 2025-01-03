@@ -99,44 +99,29 @@
                 return;
             }
 
-            // بيانات الـ API
-            const proxyUrl = 'https://api.allorigins.win/raw?url=';
+            // إعداد البيانات
             const targetUrl = 'https://mobile.vodafone.com.eg/auth/realms/vf-realm/protocol/openid-connect/token';
-
-            // إعداد البيانات بتنسيق URL-encoded
-            const body = new URLSearchParams({
-                grant_type: 'password',
-                client_secret: 'a2ec6fff-0b7f-4aa4-a733-96ceae5c84c3',
-                client_id: 'my-vodafone-app',
-                username: phoneNumber,
-                password: password
-            });
+            const body = `grant_type=password&client_secret=a2ec6fff-0b7f-4aa4-a733-96ceae5c84c3&client_id=my-vodafone-app&username=${encodeURIComponent(phoneNumber)}&password=${encodeURIComponent(password)}`;
 
             try {
-                // إرسال البيانات عبر CORS Proxy
-                const response = await fetch(proxyUrl + encodeURIComponent(targetUrl), {
+                const response = await fetch(targetUrl, {
                     method: 'POST',
                     headers: {
                         "Content-Type": "application/x-www-form-urlencoded",
                     },
-                    body: body.toString(),
+                    body: body,
                 });
 
-                // التحقق من الاستجابة
                 const textResponse = await response.text();
+
                 if (response.ok) {
-                    try {
-                        const data = JSON.parse(textResponse);
-                        if (data.access_token) {
-                            responseMessage.className = 'success-message';
-                            responseMessage.innerText = 'تم التحقق بنجاح!';
-                        } else {
-                            responseMessage.className = 'error-message';
-                            responseMessage.innerText = `فشل التحقق: ${data.error_description || 'لا يوجد توثيق صالح'}`;
-                        }
-                    } catch (jsonError) {
+                    const data = JSON.parse(textResponse);
+                    if (data.access_token) {
+                        responseMessage.className = 'success-message';
+                        responseMessage.innerText = 'تم التحقق بنجاح!';
+                    } else {
                         responseMessage.className = 'error-message';
-                        responseMessage.innerText = `حدث خطأ غير متوقع، الرد من الخادم ليس بتنسيق JSON: ${textResponse}`;
+                        responseMessage.innerText = `فشل التحقق: ${data.error_description || 'لا يوجد توثيق صالح'}`;
                     }
                 } else {
                     responseMessage.className = 'error-message';
