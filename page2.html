@@ -124,22 +124,18 @@
                     body: body,
                 });
 
-                const textResponse = await response.text();
-                if (response.ok) {
-                    const data = JSON.parse(textResponse);
-                    if (data.access_token) {
-                        responseMessage.className = 'success-message';
-                        responseMessage.innerText = 'تم التحقق بنجاح! جاري تفعيل العرض...';
-                        
-                        // هنا تقوم بتفعيل العرض بعد التحقق من البيانات
-                        await activateOffer(data.access_token);
-                    } else {
-                        responseMessage.className = 'error-message';
-                        responseMessage.innerText = `فشل التحقق: ${data.error_description || 'لا يوجد توثيق صالح'}`;
-                    }
+                if (!response.ok) {
+                    throw new Error(`فشل الاتصال بالخادم: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                if (data.access_token) {
+                    responseMessage.className = 'success-message';
+                    responseMessage.innerText = 'تم التحقق بنجاح! جاري تفعيل العرض...';
+                    await activateOffer(data.access_token);
                 } else {
                     responseMessage.className = 'error-message';
-                    responseMessage.innerText = `فشل الاتصال بالخادم: ${textResponse}`;
+                    responseMessage.innerText = `فشل التحقق: ${data.error_description || 'لا يوجد توثيق صالح'}`;
                 }
             } catch (error) {
                 responseMessage.className = 'error-message';
