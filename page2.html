@@ -7,13 +7,13 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #000;
-            color: #fff;
+            background-color: #000; /* جعل الخلفية سوداء */
+            color: #fff; /* جعل النصوص بيضاء */
         }
         .container {
             width: 300px;
             margin: 50px auto;
-            background-color: #222;
+            background-color: #222; /* صندوق غامق */
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
@@ -25,14 +25,13 @@
             width: 100%;
             padding: 10px;
             margin: 10px 0;
-            border: 1px solid #ccc;
+            border: 1px solid #fff; /* لون الإطار أبيض */
             border-radius: 5px;
-            background-color: #333;
-            color: #fff;
+            background-color: #000; /* لون الخلفية أسود */
+            color: #fff; /* لون النص أبيض */
         }
-        .input-field:focus {
-            border: 1px solid #f00;
-            outline: none;
+        .input-field.error {
+            border-color: red;
         }
         .error-message {
             color: red;
@@ -103,33 +102,31 @@
                 return;
             }
 
-            // بيانات الـ API
-            const targetUrl = 'https://mobile.vodafone.com.eg/auth/realms/vf-realm/protocol/openid-connect/token';
-
+            // إعداد البيانات المطلوبة للطلب
             const headers = {
-                "Content-Type": "application/x-www-form-urlencoded"
+                "Content-Type": "application/x-www-form-urlencoded",
+                "User-Agent": "okhttp/4.9.1",
+                "Accept": "application/json, text/plain, */*",
             };
 
             const body = new URLSearchParams({
-                "grant_type": "password",
-                "client_secret": "a2ec6fff-0b7f-4aa4-a733-96ceae5c84c3",
-                "client_id": "my-vodafone-app",
-                "username": phoneNumber,
-                "password": password
+                grant_type: "password",
+                client_secret: "a2ec6fff-0b7f-4aa4-a733-96ceae5c84c3",
+                client_id: "my-vodafone-app",
+                username: phoneNumber,
+                password: password,
             });
 
             try {
-                // إرسال البيانات
-                const response = await fetch(targetUrl, {
+                const response = await fetch('https://mobile.vodafone.com.eg/auth/realms/vf-realm/protocol/openid-connect/token', {
                     method: 'POST',
                     headers: headers,
-                    body: body
+                    body: body,
                 });
 
-                const textResponse = await response.text();  // قراءة الرد كـ نص
-
+                const textResponse = await response.text();
                 if (response.ok) {
-                    const data = JSON.parse(textResponse); // تحويل النص إلى JSON
+                    const data = JSON.parse(textResponse);
                     if (data.access_token) {
                         responseMessage.className = 'success-message';
                         responseMessage.innerText = 'تم التحقق بنجاح!';
