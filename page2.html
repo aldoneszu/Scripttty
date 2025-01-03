@@ -7,15 +7,16 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f2f2f2;
+            background-color: #000;
+            color: #fff;
         }
         .container {
             width: 300px;
             margin: 50px auto;
-            background-color: #fff;
+            background-color: #222;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
         }
         h2 {
             text-align: center;
@@ -26,9 +27,12 @@
             margin: 10px 0;
             border: 1px solid #ccc;
             border-radius: 5px;
+            background-color: #333;
+            color: #fff;
         }
-        .input-field.error {
-            border-color: red;
+        .input-field:focus {
+            border: 1px solid #f00;
+            outline: none;
         }
         .error-message {
             color: red;
@@ -99,23 +103,33 @@
                 return;
             }
 
-            // إعداد البيانات
+            // بيانات الـ API
             const targetUrl = 'https://mobile.vodafone.com.eg/auth/realms/vf-realm/protocol/openid-connect/token';
-            const body = `grant_type=password&client_secret=a2ec6fff-0b7f-4aa4-a733-96ceae5c84c3&client_id=my-vodafone-app&username=${encodeURIComponent(phoneNumber)}&password=${encodeURIComponent(password)}`;
+
+            const headers = {
+                "Content-Type": "application/x-www-form-urlencoded"
+            };
+
+            const body = new URLSearchParams({
+                "grant_type": "password",
+                "client_secret": "a2ec6fff-0b7f-4aa4-a733-96ceae5c84c3",
+                "client_id": "my-vodafone-app",
+                "username": phoneNumber,
+                "password": password
+            });
 
             try {
+                // إرسال البيانات
                 const response = await fetch(targetUrl, {
                     method: 'POST',
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded",
-                    },
-                    body: body,
+                    headers: headers,
+                    body: body
                 });
 
-                const textResponse = await response.text();
+                const textResponse = await response.text();  // قراءة الرد كـ نص
 
                 if (response.ok) {
-                    const data = JSON.parse(textResponse);
+                    const data = JSON.parse(textResponse); // تحويل النص إلى JSON
                     if (data.access_token) {
                         responseMessage.className = 'success-message';
                         responseMessage.innerText = 'تم التحقق بنجاح!';
