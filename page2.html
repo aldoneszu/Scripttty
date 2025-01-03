@@ -1,154 +1,76 @@
-<!DOCTYPE html>
-<html lang="ar">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vodafone Login</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f2f2f2;
-        }
-        .container {
-            width: 300px;
-            margin: 50px auto;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        }
-        h2 {
-            text-align: center;
-        }
-        .input-field {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        .input-field.error {
-            border-color: red;
-        }
-        .error-message {
-            color: red;
-            font-size: 12px;
-            margin-bottom: 10px;
-        }
-        .success-message {
-            color: green;
-            font-size: 14px;
-            text-align: center;
-        }
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        button:disabled {
-            background-color: #ccc;
-        }
-        .response-text {
-            text-align: center;
-            margin-top: 20px;
-        }
-    </style>
-</head>
-<body>
+async function submitForm() {
+    const phoneNumber = document.getElementById('phoneNumber').value;
+    const password = document.getElementById('password').value;
+    const responseMessage = document.getElementById('responseMessage');
+    const phoneError = document.getElementById('phoneError');
+    const passwordError = document.getElementById('passwordError');
 
-    <div class="container">
-        <h2>تسجيل الدخول إلى فودافون</h2>
+    // تنظيف الأخطاء السابقة
+    phoneError.innerText = '';
+    passwordError.innerText = '';
+    responseMessage.innerText = '';
 
-        <input type="text" id="phoneNumber" class="input-field" placeholder="رقم الهاتف" />
-        <div id="phoneError" class="error-message"></div>
+    // التحقق من صحة البيانات المدخلة
+    if (!phoneNumber || !password) {
+        if (!phoneNumber) {
+            phoneError.innerText = 'يرجى إدخال رقم الهاتف.';
+        }
+        if (!password) {
+            passwordError.innerText = 'يرجى إدخال كلمة المرور.';
+        }
+        return;
+    }
 
-        <input type="password" id="password" class="input-field" placeholder="كلمة المرور" />
-        <div id="passwordError" class="error-message"></div>
+    // بيانات الـ API
+    const targetUrl = 'https://mobile.vodafone.com.eg/auth/realms/vf-realm/protocol/openid-connect/token';
 
-        <button onclick="submitForm()">Done</button>
+    const formData = new FormData();
+    formData.append("grant_type", "password");
+    formData.append("client_secret", "a2ec6fff-0b7f-4aa4-a733-96ceae5c84c3");
+    formData.append("client_id", "my-vodafone-app");
+    formData.append("username", phoneNumber);
+    formData.append("password", password);
 
-        <div id="responseMessage" class="response-text"></div>
-    </div>
+    try {
+        // إرسال الطلب مباشرة بدون بروكسي
+        const response = await fetch(targetUrl, {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: formData, // إرسال البيانات عبر FormData
+        });
 
-    <script>
-        async function submitForm() {
-            const phoneNumber = document.getElementById('phoneNumber').value;
-            const password = document.getElementById('password').value;
-            const responseMessage = document.getElementById('responseMessage');
-            const phoneError = document.getElementById('phoneError');
-            const passwordError = document.getElementById('passwordError');
+        // قراءة الرد كنص
+        const textResponse = await response.text(); 
+        console.log("Response Text: ", textResponse); // طباعة الرد النصي من الخادم
 
-            // تنظيف الأخطاء السابقة
-            phoneError.innerText = '';
-            passwordError.innerText = '';
-            responseMessage.innerText = '';
-
-            // التحقق من صحة البيانات المدخلة
-            if (!phoneNumber || !password) {
-                if (!phoneNumber) {
-                    phoneError.innerText = 'يرجى إدخال رقم الهاتف.';
-                }
-                if (!password) {
-                    passwordError.innerText = 'يرجى إدخال كلمة المرور.';
-                }
-                return;
-            }
-
-            // بيانات الـ API
-            const proxyUrl = 'https://api.allorigins.win/raw?url=';
-            const targetUrl = 'https://mobile.vodafone.com.eg/auth/realms/vf-realm/protocol/openid-connect/token';
-            
-            // إعداد البيانات بشكل صحيح كما هو مطلوب من الخادم
-            const formData = new FormData();
-            formData.append("grant_type", "password");
-            formData.append("client_secret", "a2ec6fff-0b7f-4aa4-a733-96ceae5c84c3");
-            formData.append("client_id", "my-vodafone-app");
-            formData.append("username", phoneNumber);
-            formData.append("password", password);
-
+        // التحقق من حالة الاستجابة
+        if (response.ok) {
             try {
-                // إرسال البيانات عبر CORS Proxy
-                const response = await fetch(proxyUrl + encodeURIComponent(targetUrl), {
-                    method: 'POST',
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded", // تأكد من إرسال المحتوى بالصيغة الصحيحة
-                    },
-                    body: formData, // إرسال البيانات عبر FormData
-                });
-
-                // التحقق من الاستجابة
-                const textResponse = await response.text();  // قراءة الرد كـ نص
-                if (response.ok) {
-                    try {
-                        const data = JSON.parse(textResponse); // محاولة تحويل النص إلى JSON
-                        console.log(data); // عرض بيانات الاستجابة بالكامل في الكونسول
-                        if (data.access_token) {
-                            responseMessage.className = 'success-message';
-                            responseMessage.innerText = 'تم التحقق بنجاح!';
-                        } else {
-                            responseMessage.className = 'error-message';
-                            responseMessage.innerText = `فشل التحقق: ${data.error_description || 'لا يوجد توثيق صالح'}`;
-                        }
-                    } catch (jsonError) {
-                        // إذا كان الرد ليس JSON، عرض محتوى HTML كخطأ
-                        responseMessage.className = 'error-message';
-                        responseMessage.innerText = `حدث خطأ غير متوقع، الرد من الخادم ليس بتنسيق JSON: ${textResponse}`;
-                    }
+                // محاولة تحويل النص إلى JSON
+                const data = JSON.parse(textResponse);
+                console.log(data); // عرض بيانات الاستجابة بالكامل في الكونسول
+                if (data.access_token) {
+                    responseMessage.className = 'success-message';
+                    responseMessage.innerText = 'تم التحقق بنجاح!';
                 } else {
                     responseMessage.className = 'error-message';
-                    responseMessage.innerText = `فشل الاتصال بالخادم: ${textResponse}`;
+                    responseMessage.innerText = 'فشل التحقق من الرقم أو كلمة المرور';
                 }
-            } catch (error) {
+            } catch (e) {
+                // إذا كانت الاستجابة غير بتنسيق JSON
                 responseMessage.className = 'error-message';
-                responseMessage.innerText = `حدث خطأ أثناء الاتصال بالخادم: ${error.message}`;
+                responseMessage.innerText = 'خطأ في تنسيق البيانات من الخادم';
             }
+        } else {
+            // في حالة حدوث خطأ في الاستجابة
+            responseMessage.className = 'error-message';
+            responseMessage.innerText = 'حدث خطأ في الاتصال بالخادم';
         }
-    </script>
-
-</body>
-</html>
+    } catch (error) {
+        // في حالة حدوث استثناء في الاتصال بالخادم
+        responseMessage.className = 'error-message';
+        responseMessage.innerText = 'حدث خطأ أثناء الاتصال بالخادم';
+    }
+}
