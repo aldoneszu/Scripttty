@@ -3,179 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vodafone Activation</title>
+    <title>صفحة التسجيل</title>
     <style>
         body {
-            background-color: black;
             font-family: Arial, sans-serif;
-            color: white;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-        }
-
-        .container {
-            max-width: 500px;
-            margin: 50px auto;
+            background-color: #f4f4f9;
             padding: 20px;
-            background-color: #1a1a1a;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
         }
-
+        .container {
+            max-width: 400px;
+            margin: auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+        }
         input {
             width: 100%;
             padding: 10px;
-            margin: 10px 0;
-            background-color: #333;
-            color: white;
-            border: 1px solid #444;
             border-radius: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
         }
-
-        input[type="text"], input[type="password"] {
-            border: 3px solid red;
-        }
-
-        .error-message {
+        .error {
             color: red;
-            font-size: 14px;
-            margin-top: -10px;
-            text-align: left;
+            font-size: 12px;
+            margin-top: 5px;
         }
-
-        #done-btn {
-            background-color: #555;
-            color: white;
-            padding: 10px 20px;
+        .success {
+            color: green;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007BFF;
             border: none;
+            color: white;
+            font-size: 16px;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
-        }
-
-        #done-btn:hover {
-            background-color: #444;
-        }
-
-        #script-name {
-            font-size: 18px;
-            color: blue;
             font-weight: bold;
-            margin-bottom: 20px;
         }
-
-        #done-btn {
-            width: 50%;
-            margin-top: 20px;
+        .button:disabled {
+            background-color: #b0c4de;
         }
-
+        #error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div id="script-name">SCRIPT STARKO HACKER</div>
-    <input type="text" id="num" placeholder="أدخل رقم فودافون" />
-    <div id="num-error" class="error-message"></div>
-    <input type="password" id="password" placeholder="أدخل كلمة المرور" />
-    <div id="password-error" class="error-message"></div>
-    <button id="done-btn">Done</button>
+    <h2 style="text-align:center; color: #007BFF;">Script Starko Hacker</h2>
+
+    <div class="form-group">
+        <label for="phone">رقم الهاتف</label>
+        <input type="text" id="phone" placeholder="أدخل رقم فودافون" />
+        <div id="phone-error" class="error"></div>
+    </div>
+
+    <div class="form-group">
+        <label for="password">كلمة المرور</label>
+        <input type="password" id="password" placeholder="أدخل كلمة المرور" />
+        <div id="password-error" class="error"></div>
+    </div>
+
+    <button class="button" id="done-btn">تم</button>
+
+    <div id="error-message"></div>
 </div>
 
 <script>
-    document.getElementById('done-btn').addEventListener('click', function () {
-        var num = document.getElementById('num').value;
-        var password = document.getElementById('password').value;
-        var numError = document.getElementById('num-error');
-        var passwordError = document.getElementById('password-error');
+    async function checkLogin(username, password) {
+        const phoneErrorElement = document.getElementById("phone-error");
+        const passwordErrorElement = document.getElementById("password-error");
+        const errorMessageElement = document.getElementById("error-message");
+        
+        // تفريغ الأخطاء السابقة
+        phoneErrorElement.innerHTML = "";
+        passwordErrorElement.innerHTML = "";
+        errorMessageElement.innerHTML = "";
 
-        // مسح أي أخطاء قديمة
-        numError.innerText = '';
-        passwordError.innerText = '';
-
-        // التحقق من البيانات المدخلة
-        if (!num || !password) {
-            if (!num) numError.innerText = "يرجى إدخال رقم فودافون";
-            if (!password) passwordError.innerText = "يرجى إدخال كلمة المرور";
+        if (!username || !password) {
+            if (!username) {
+                phoneErrorElement.innerHTML = "يرجى إدخال رقم الهاتف";
+            }
+            if (!password) {
+                passwordErrorElement.innerHTML = "يرجى إدخال كلمة المرور";
+            }
             return;
         }
 
-        // إرسال الطلب للتحقق من الرقم والباسورد
-        var loginUrl = "https://mobile.vodafone.com.eg/auth/realms/vf-realm/protocol/openid-connect/token";
-        var headers = {
-            "Accept": "application/json, text/plain, */*",
-            "Content-Type": "application/x-www-form-urlencoded",
-            "User-Agent": "okhttp/4.9.1",
-        };
+        try {
+            const response = await fetch('https://mobile.vodafone.com.eg/auth/realms/vf-realm/protocol/openid-connect/token', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json, text/plain, */*',
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    'grant_type': 'password',
+                    'client_secret': 'a2ec6fff-0b7f-4aa4-a733-96ceae5c84c3',
+                    'client_id': 'my-vodafone-app',
+                    'username': username,
+                    'password': password,
+                })
+            });
 
-        var data = new URLSearchParams();
-        data.append("grant_type", "password");
-        data.append("client_secret", "a2ec6fff-0b7f-4aa4-a733-96ceae5c84c3");
-        data.append("client_id", "my-vodafone-app");
-        data.append("username", num);
-        data.append("password", password);
-
-        fetch(loginUrl, {
-            method: 'POST',
-            headers: headers,
-            body: data
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("فشل التحقق من الرقم أو الباسورد");
-            }
-            return response.json();
-        })
-        .then(data => {
-            var accessToken = data.access_token;
-            if (accessToken) {
-                subscribeToPromo(accessToken);
+            const data = await response.json();
+            
+            if (response.ok) {
+                errorMessageElement.innerHTML = "<span class='success'>تم التحقق بنجاح</span>";
+                // يمكنك متابعة العملية هنا، مثل الاشتراك في الباقة
             } else {
-                throw new Error("لم يتم العثور على رمز الوصول");
+                errorMessageElement.innerHTML = "<span class='error'>فشل التحقق من الرقم أو الباسورد</span>";
             }
-        })
-        .catch(error => {
-            // عرض الخطأ في النص أعلى الرقم
-            numError.innerText = "حدث خطأ: " + error.message;
-        });
-    });
-
-    // دالة الاشتراك في العرض بعد التحقق
-    function subscribeToPromo(accessToken) {
-        var promoUrl = "https://mobile.vodafone.com.eg/mobile-app/promo/unifiedRedeemPromo?lang=ar";
-        var headers = {
-            "Accept": "application/json, text/plain, */*",
-            "Authorization": "Bearer " + accessToken,
-            "User-Agent": "okhttp/4.9.1",
-        };
-        var data = {
-            "promoId": "2633",
-            "channelId": "1",
-            "wlistId": "2553",
-            "contextualPromoId": "13",
-            "triggerId": "189",
-            "param3": "0.5",
-            "param4": "1",
-            "param6": "0",
-            "param1": "5",
-            "param2": "50",
-        };
-
-        fetch(promoUrl, {
-            method: 'POST',
-            headers: headers,
-            body: JSON.stringify(data)
-        })
-        .then(response => response.json())
-        .then(responseData => {
-            alert("تم الاشتراك في العرض بنجاح!");
-        })
-        .catch(error => {
-            alert("حدث خطأ أثناء الاشتراك في العرض: " + error.message);
-        });
+        } catch (error) {
+            errorMessageElement.innerHTML = "<span class='error'>حدث خطأ أثناء الاتصال بالخادم: " + error.message + "</span>";
+        }
     }
+
+    document.getElementById('done-btn').addEventListener('click', async () => {
+        const username = document.getElementById('phone').value;
+        const password = document.getElementById('password').value;
+        
+        await checkLogin(username, password);
+    });
 </script>
 
 </body>
