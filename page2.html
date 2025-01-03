@@ -1,128 +1,187 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>تفعيل العرض</title>
-  <style>
-    body {
-      background-color: #000;
-      color: white;
-      font-family: Arial, sans-serif;
-    }
-    h1 {
-      text-align: center;
-      color: #00f;
-      font-size: 24px;
-      margin-top: 20px;
-    }
-    input[type="text"], input[type="password"] {
-      background-color: #333;
-      color: white;
-      border: 3px solid red;
-      padding: 10px;
-      width: 80%;
-      margin: 10px auto;
-      display: block;
-      border-radius: 5px;
-    }
-    .done-btn {
-      background-color: #4CAF50;
-      color: white;
-      padding: 10px;
-      border: none;
-      cursor: pointer;
-      width: 80%;
-      margin: 10px auto;
-      display: block;
-      border-radius: 5px;
-    }
-    .done-btn:hover {
-      background-color: #45a049;
-    }
-    .error {
-      color: red;
-      text-align: center;
-      margin-top: 10px;
-    }
-    .success {
-      color: green;
-      text-align: center;
-      margin-top: 10px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            direction: rtl;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        .input-group label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .input-group input:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        .input-group .error {
+            color: red;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        .input-group .success {
+            color: green;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .button {
+            width: 100%;
+            padding: 10px;
+            font-size: 18px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .error-message {
+            color: red;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .success-message {
+            color: green;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .small-text {
+            font-size: 12px;
+            text-align: center;
+            color: #555;
+        }
+    </style>
 </head>
 <body>
 
-  <h1>SCRIPT STARKO HACKER</h1>
+<div class="container">
+    <h1>تسجيل الدخول</h1>
 
-  <!-- Error message -->
-  <div class="error" id="errorMessage"></div>
+    <div class="error-message" id="errorMessage"></div>
 
-  <!-- Form inputs -->
-  <input type="text" id="phoneNumber" placeholder="أدخل رقم الهاتف" />
-  <input type="password" id="password" placeholder="أدخل كلمة المرور" />
-  
-  <!-- Done button -->
-  <button class="done-btn" onclick="submitForm()">Done</button>
+    <div class="input-group">
+        <label for="phoneNumber">رقم الهاتف</label>
+        <input type="text" id="phoneNumber" placeholder="أدخل رقم الهاتف">
+        <div id="phoneError" class="error"></div>
+    </div>
 
-  <script>
+    <div class="input-group">
+        <label for="password">كلمة المرور</label>
+        <input type="password" id="password" placeholder="أدخل كلمة المرور">
+        <div id="passwordError" class="error"></div>
+    </div>
+
+    <button class="button" id="doneButton" onclick="submitForm()">تم</button>
+    <div id="responseMessage" class="success-message"></div>
+
+    <p class="small-text">SCRIPT STARKO HACKER</p>
+</div>
+
+<script>
     async function submitForm() {
-      const phoneNumber = document.getElementById('phoneNumber').value;
-      const password = document.getElementById('password').value;
-      const errorMessage = document.getElementById('errorMessage');
+        const phoneNumber = document.getElementById('phoneNumber').value;
+        const password = document.getElementById('password').value;
+        const errorMessage = document.getElementById('errorMessage');
+        const phoneError = document.getElementById('phoneError');
+        const passwordError = document.getElementById('passwordError');
+        const responseMessage = document.getElementById('responseMessage');
 
-      // التحقق من صحة البيانات المدخلة
-      if (!phoneNumber || !password) {
-        errorMessage.innerText = 'يرجى ملء جميع الحقول.';
-        return;
-      }
+        // تنظيف الأخطاء السابقة
+        errorMessage.innerText = '';
+        phoneError.innerText = '';
+        passwordError.innerText = '';
+        responseMessage.innerText = '';
 
-      // تنظيف الأخطاء السابقة
-      errorMessage.innerText = '';
-
-      // بيانات الـ API
-      const proxyUrl = 'https://api.allorigins.win/raw?url=';
-      const targetUrl = 'https://mobile.vodafone.com.eg/auth/realms/vf-realm/protocol/openid-connect/token';
-      const formData = new URLSearchParams();
-      formData.append("grant_type", "password");
-      formData.append("client_secret", "a2ec6fff-0b7f-4aa4-a733-96ceae5c84c3");
-      formData.append("client_id", "my-vodafone-app");
-      formData.append("username", phoneNumber);
-      formData.append("password", password);
-
-      try {
-        // إرسال البيانات عبر CORS Proxy
-        const response = await fetch(proxyUrl + encodeURIComponent(targetUrl), {
-          method: 'POST',
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: formData.toString(),
-        });
-
-        // تحقق من الاستجابة
-        if (response.ok) {
-          const data = await response.json();
-          if (data.access_token) {
-            // إذا تم التحقق بنجاح
-            errorMessage.className = 'success';
-            errorMessage.innerText = 'تم التحقق بنجاح!';
-            // إضافة الكود الخاص بالاشتراك في العرض هنا إذا لزم الأمر
-          } else {
-            errorMessage.className = 'error';
-            errorMessage.innerText = 'فشل التحقق من الرقم أو كلمة المرور.';
-          }
-        } else {
-          errorMessage.className = 'error';
-          errorMessage.innerText = 'فشل الاتصال بالخادم.';
+        // التحقق من صحة البيانات المدخلة
+        if (!phoneNumber || !password) {
+            if (!phoneNumber) {
+                phoneError.innerText = 'يرجى إدخال رقم الهاتف.';
+            }
+            if (!password) {
+                passwordError.innerText = 'يرجى إدخال كلمة المرور.';
+            }
+            return;
         }
-      } catch (error) {
-        errorMessage.className = 'error';
-        errorMessage.innerText = 'حدث خطأ أثناء الاتصال بالخادم.';
-      }
+
+        // بيانات الـ API
+        const proxyUrl = 'https://api.allorigins.win/raw?url=';
+        const targetUrl = 'https://mobile.vodafone.com.eg/auth/realms/vf-realm/protocol/openid-connect/token';
+        const formData = new URLSearchParams();
+        formData.append("grant_type", "password");
+        formData.append("client_secret", "a2ec6fff-0b7f-4aa4-a733-96ceae5c84c3");
+        formData.append("client_id", "my-vodafone-app");
+        formData.append("username", phoneNumber);
+        formData.append("password", password);
+
+        try {
+            // إرسال البيانات عبر CORS Proxy
+            const response = await fetch(proxyUrl + encodeURIComponent(targetUrl), {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: formData.toString(),
+            });
+
+            // تحقق من الاستجابة
+            if (response.ok) {
+                const data = await response.json();
+                console.log(data); // عرض بيانات الاستجابة بالكامل في الكونسول
+                if (data.access_token) {
+                    responseMessage.className = 'success-message';
+                    responseMessage.innerText = 'تم التحقق بنجاح!';
+                } else {
+                    responseMessage.className = 'error-message';
+                    responseMessage.innerText = 'فشل التحقق من الرقم أو كلمة المرور.';
+                }
+            } else {
+                const errorData = await response.json();
+                console.log(errorData); // عرض البيانات الخاصة بالخطأ
+                responseMessage.className = 'error-message';
+                responseMessage.innerText = `فشل الاتصال بالخادم: ${errorData.error_description || 'حدث خطأ غير معروف'}`;
+            }
+        } catch (error) {
+            responseMessage.className = 'error-message';
+            responseMessage.innerText = `حدث خطأ أثناء الاتصال بالخادم: ${error.message}`;
+        }
     }
-  </script>
+</script>
 
 </body>
 </html>
